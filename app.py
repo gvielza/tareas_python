@@ -6,6 +6,8 @@ import wx.adv
 from base_datos.conexion import Conexion
 
 
+
+
 class MiVentana(wx.Frame):
     def __init__(self, *args, **kw):
         super(MiVentana, self).__init__(*args, **kw)
@@ -22,8 +24,9 @@ class MiVentana(wx.Frame):
         fecha = wx.adv.DatePickerCtrl(panel,style=wx.adv.CAL_SHOW_HOLIDAYS)
         #hora = wx.adv.TimePickerCtrl(panel)
         boton_agregar=wx.Button(panel, label="Agregar")
-        boton_agregar.Bind(wx.EVT_BUTTON, lambda event: self.agregar_tarea(event, tarea.GetValue(), fecha.GetValue(),
-                                                                           tarea_nueva,fecha_nueva))
+        boton_agregar.Bind(wx.EVT_BUTTON, lambda event: self.agregar_tarea(event, tarea.GetValue(), fecha.GetValue()))
+
+
         boton_eliminar_tareas = wx.Button(panel, label="Eliminar tareas")
         boton_eliminar_tareas.Bind(wx.EVT_BUTTON, lambda event: self.eliminar_tareas(event))
         #La nueva tarea
@@ -53,6 +56,7 @@ class MiVentana(wx.Frame):
         box_sizer_horizontal_nueva.Add(tarea_nueva, 0, wx.ALIGN_CENTER | wx.TOP, 10)
 
 
+
         box_sizer_vertical.Add(box_sizer_horizontal)
         box_sizer_vertical.Add(box_sizer_horizontal_nueva, 0, wx.ALIGN_LEFT | wx.TOP, 10)
 
@@ -71,10 +75,10 @@ class MiVentana(wx.Frame):
         self.mostrar_tareas()
 
 
-    def agregar_tarea(self, event,  tarea,fecha,tarea_nueva,fecha_nueva):
+    def agregar_tarea(self, event,  tarea,fecha):
         print(f"La tarea es: {tarea} y la fecha es: {fecha.Format('%Y-%m-%d')}")  # Imprime la tarea y la fecha (  tarea+ fecha)
-        tarea_nueva.SetLabel(tarea)
-        fecha_nueva.SetLabel(fecha.Format('%d-%m-%Y'))  # Imprime la fecha (fecha.Format('%Y-%m-%d'))
+        #tarea_nueva.SetLabel(tarea)
+        #fecha_nueva.SetLabel(fecha.Format('%d-%m-%Y'))  # Imprime la fecha (fecha.Format('%Y-%m-%d'))
         nombre_base_de_datos = 'tareas.db'
         conexion=Conexion(nombre_base_de_datos)
         conexion.crear_tabla_tareas()
@@ -94,37 +98,44 @@ class MiVentana(wx.Frame):
     def mostrar_tareas(self):
         nombre_base_de_datos = 'tareas.db'
         conexion = Conexion(nombre_base_de_datos)
-        tareas = conexion.mostrar_tareas()
+        tareas = conexion.obtener_tareas()
 
         box_tareas_vertical = wx.BoxSizer(wx.VERTICAL)
 
         panel_tareas = wx.Panel(self)
         panel_tareas.SetPosition((10, 120))
-        espaciador_tareas = wx.StaticText(panel_tareas, label=" ", size=(1, 20))  # Ajusta el tamaño del espaciador
-        box_tareas_vertical.Add(espaciador_tareas, 0, wx.EXPAND)
+
+
+
 
         for tarea in tareas:
             print(tarea[1])
             box_tareas_horizontal = wx.BoxSizer(wx.HORIZONTAL)
+            check_box = wx.CheckBox(panel_tareas, label="")
+
+
             static_text_fecha = wx.StaticText(panel_tareas, label=tarea[2])
             static_text_tarea = wx.StaticText(panel_tareas, label=tarea[1])
-            boton_editar_tarea = wx.Button(panel_tareas, label="Editar")
-            boton_eliminar_tarea = wx.Button(panel_tareas, wx.ID_DELETE)
 
-            imagen_editar = wx.Image('src/editar.png', wx.BITMAP_TYPE_PNG)
+            imagen_editar = wx.Image('src/editar2.png', wx.BITMAP_TYPE_PNG)
             btn_editar = wx.BitmapButton(panel_tareas, bitmap=wx.Bitmap(imagen_editar))
-            btn_editar.SetSize((10, 10))
+
+            imagen_eliminar = wx.Image('src/eliminar2.png', wx.BITMAP_TYPE_PNG)
+            btn_eliminar = wx.BitmapButton(panel_tareas, bitmap=wx.Bitmap(imagen_eliminar))
 
 
+
+            btn_editar.Bind(wx.EVT_BUTTON, lambda event: self.editar_tarea(event, static_text_tarea, static_text_fecha))
 
             box_tareas_horizontal.Add(static_text_fecha, 0, wx.ALL, 10)
             box_tareas_horizontal.Add(static_text_tarea, 0, wx.ALL, 10)
             box_tareas_horizontal.Add(btn_editar, 0, wx.ALL, 10)
+            box_tareas_horizontal.Add(btn_eliminar, 0, wx.ALL, 10)
+            box_tareas_horizontal.Add(check_box, 0, wx.ALL, 10)
 
-            box_tareas_horizontal.Add(boton_eliminar_tarea, 0, wx.ALL, 10)
 
-            #box_tareas_vertical.Add(static_text_fecha, 0, wx.ALL, 10)
-            box_tareas_vertical.Add(box_tareas_horizontal, 0, wx.ALL, 10)
+            box_tareas_vertical.Add(box_tareas_horizontal, 0, wx.ALL, 1)
+
 
 
         # Establece el wx.BoxSizer vertical como el Sizer del panel
@@ -141,6 +152,17 @@ class MiVentana(wx.Frame):
         image = bitmap.ConvertToImage()
         image = image.Scale(ancho, alto, wx.IMAGE_QUALITY_HIGH)
         return wx.Bitmap(image)
+
+    def editar_tarea(self, event, static_text_tarea, static_text_fecha):
+        print("La tarea es: " + static_text_tarea.GetLabel() + " y la fecha es: " + static_text_fecha.GetLabel())
+
+    def obtener_tareas(self):
+        base_datos='./tareas.db'
+        conexion=Conexion(base_datos)
+        tareas = conexion.obtener_tareas()
+        conexion.cerrar_conexion()
+        return tareas
+
 
 
 if __name__ == '__main__':

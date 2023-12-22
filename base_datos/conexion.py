@@ -18,7 +18,7 @@ class Conexion:
         self.cursor.execute("INSERT INTO tareas (tarea, fecha) VALUES (?, ?)", (tarea, fecha))
         self.conexion.commit()
 
-    def mostrar_tareas(self):
+    def obtener_tareas(self):
         self.cursor.execute("SELECT * FROM tareas Order By id DESC")
         tareas = self.cursor.fetchall()
         return tareas
