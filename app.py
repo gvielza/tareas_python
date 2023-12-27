@@ -57,8 +57,27 @@ class MiVentana(wx.Frame):
 
 
 
+
+
         box_sizer_vertical.Add(box_sizer_horizontal)
         box_sizer_vertical.Add(box_sizer_horizontal_nueva, 0, wx.ALIGN_LEFT | wx.TOP, 10)
+
+        # probar checkbox
+        check_box = wx.CheckBox(panel, label="Marcar")
+        box_h=wx.BoxSizer(wx.HORIZONTAL)
+        texto = wx.StaticText(panel, label="Texto")
+
+        box_h.Add(texto, 0, wx.ALIGN_LEFT | wx.TOP, 10)
+        tareas_bd=self.obtener_tareas()
+
+        for i in tareas_bd:
+            check_box2=wx.CheckBox(panel, label="Marcar")
+
+            box_h.Add(check_box2, 0, wx.ALIGN_LEFT | wx.TOP, 10)
+            box_h.Add(i[1], 0, wx.ALIGN_LEFT | wx.TOP, 10)
+
+        box_sizer_vertical.Add(box_h, 0, wx.ALIGN_LEFT | wx.TOP, 10)
+
 
 
         # Establecer el BoxSizer en el panel
